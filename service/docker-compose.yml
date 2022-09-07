@@ -1,0 +1,24 @@
+services:
+
+    http:
+        image: nginx:stable-alpine
+        ports:
+            - ${PORT}:80
+        volumes:
+            - ../api:/var/www
+            - ./conf.d:/etc/nginx/conf.d
+        container_name: ${CONTAINER_PREFIX}-http
+        networks:
+            - default
+
+    php:
+        image: php:8.1-fpm-alpine
+        volumes:
+            - ../api:/var/www
+        container_name: ${CONTAINER_PREFIX}-php
+        networks:
+            - default
+
+networks:
+    default:
+
