@@ -12,7 +12,8 @@ services:
             - default
 
     php:
-        image: php:8.1-fpm-alpine
+        image: php:8.1-fpm-alpine-extended
+        build: ./php-extended
         volumes:
             - ../api:/var/www
         container_name: ${CONTAINER_PREFIX}-php
