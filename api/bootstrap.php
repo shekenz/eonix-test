@@ -22,57 +22,40 @@ try
     // Database connection
     $dbHandler = new PDO('mysql:host='.$_ENV['DB_HOST'].';port='.$_ENV['DB_PORT'].';charset=utf8mb4', $_ENV['DB_USER'], $_ENV['DB_PASSWORD']);
 
-    // We deactivate momentary PDOException report to detetect manually if database exists
-    $dbHandler->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+    // Check database
+    $dbHandler->query('CREATE DATABASE IF NOT EXISTS '.$_ENV['DB_NAME']);
 
-    // Try to use database
+    // Use database
     $dbHandler->exec('USE '.$_ENV['DB_NAME']);
 
-    // Handling manually missing database error
-    if($dbHandler->errorCode() !== '00000')
-    {
-        if($dbHandler->errorInfo()[1] === 1049)
-        {
-            // Setting PDOException back on in case something else goes wrong with the query
-            $dbHandler->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-            // Creating database
-            $dbHandler->query('CREATE DATABASE IF NOT EXISTS '.$_ENV['DB_NAME']);
-            $log->info('Database "'.$_ENV['DB_NAME'].'" created.');
-        }
+    // Check user table
 
-        else
-        {
-            // Manually throwing exception on unhandled errors
-            throw new PDOException();
-        }
-    }
-    
-    // Setting PDOException back on in case something else goes wrong later on
-    $dbHandler->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    $log->info('Database "'.$_ENV['DB_NAME'].'" found.');
+    // NOTE : It is not a good idea to store UUID as a primary index, it is bad for performance.
+    // More info here : https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
+    // Since it is required by the exercice, I'm storing them as binary for better optimization, as explained here :
+    // https://stitcher.io/blog/optimised-uuids-in-mysql
+    $dbHandler->query('CREATE TABLE IF NOT EXISTS users (id binary(36), firstname varchar(255), lastname varchar(255))');
 }
 
 catch(PDOException $e)
 {
     // Handling permission denied exceptions
-    if(isset($e->errorInfo) && $e->errorInfo[1] === 1044)
+    if(isset($e->errorInfo) && $e->errorInfo[1] === 1044) // Error 1044 : Access denied for user '%s'@'%s' to database '%s'
     {
-        // REFACTOR Return error 500
+        // REFACTOR Redirect error 500
         $log->error('Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the CREATE privilege.');
     }
 
     else
     {
-        // REFACTOR Return error 500
+        // REFACTOR Redirect error 500
         $log->error('Caught unhandled PDOException : '.$e->getMessage());
     }
 }
 
 catch(InvalidPathException $e)
 {
-    // REFACTOR Return error 500
+    // REFACTOR Redirect error 500
     $log->error($e->getMessage());
     $log->info('Make sure you copied .env.example to .env and correctly edited it.');
 }
