@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-docker exec -it eonix-test-php php vendor/bin/phpunit --colors --printer 'Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9' $@
+docker exec -t eonix-test-php php vendor/bin/phpunit $@

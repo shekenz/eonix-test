@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit
+    bootstrap="api/bootstrap.php"
+    printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
+    colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit tests">
+            <directory>tests/unit</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
