@@ -5,17 +5,18 @@ services:
         ports:
             - ${PORT}:80
         volumes:
-            - ../api:/var/www
-            - ./conf.d:/etc/nginx/conf.d
+            - ../:/var/www
+            - ./conf/nginx/conf.d:/etc/nginx/conf.d:ro
         container_name: ${CONTAINER_PREFIX}-http
         networks:
             - default
 
     php:
         image: php:8.1-fpm-alpine-extended
-        build: ./php-extended
+        build: ./image/php
         volumes:
-            - ../api:/var/www
+            - ../:/var/www
+            - ./conf/php/conf.d/extra.ini:/usr/local/etc/php/conf.d/extra.ini:ro
         container_name: ${CONTAINER_PREFIX}-php
         networks:
             - default
