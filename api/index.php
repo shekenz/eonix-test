@@ -1,3 +1,3 @@
 <?php
 
-echo('It works !');
+include_once 'bootstrap.php';
