@@ -5,8 +5,16 @@ include_once __DIR__.'/../vendor/autoload.php';
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
 
+use Monolog\Level;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 try
 {
+    // New log channel
+    $log = new Logger('api');
+    $log->pushHandler(new StreamHandler(__DIR__.'/../api.log', Level::Debug));
+
     // Loading .env configuration
     $dotenv = Dotenv::createImmutable(__DIR__.'/../');
     $dotenv->load();
@@ -30,9 +38,7 @@ try
     
             // Creating database
             $dbHandler->query('CREATE DATABASE IF NOT EXISTS '.$_ENV['DB_NAME']);
-            // REFACTOR Log to monolog
-            echo 'Database "'.$_ENV['DB_NAME'].'" created.<br>';
-    
+            $log->info('Database "'.$_ENV['DB_NAME'].'" created.');
         }
 
         else
@@ -45,8 +51,7 @@ try
     // Setting PDOException back on in case something else goes wrong later on
     $dbHandler->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // REFACTOR Log to monolog
-    echo 'Database "'.$_ENV['DB_NAME'].'" found.<br>';
+    $log->info('Database "'.$_ENV['DB_NAME'].'" found.');
 }
 
 catch(PDOException $e)
@@ -54,21 +59,21 @@ catch(PDOException $e)
     // Handling permission denied exceptions
     if(isset($e->errorInfo) && $e->errorInfo[1] === 1044)
     {
-        // REFACTOR Log to monolog and return error 500
-        echo 'Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the <b>CREATE</b> privilege.<br>';
+        // REFACTOR Return error 500
+        $log->error('Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the CREATE privilege.');
     }
 
     else
     {
-        // REFACTOR Log to monolog and return error 500
-        echo '<b>Caught unhandled PDOException : </b>'.$e->getMessage();
+        // REFACTOR Return error 500
+        $log->error('Caught unhandled PDOException : '.$e->getMessage());
     }
 }
 
 catch(InvalidPathException $e)
 {
-    // REFACTOR Log to monolog and return error 500
-    echo $e->getMessage().'<br>';
-    echo 'Make sure you copied .env.example to .env and correctly edited it.';
+    // REFACTOR Return error 500
+    $log->error($e->getMessage());
+    $log->info('Make sure you copied .env.example to .env and correctly edited it.');
 }
 
