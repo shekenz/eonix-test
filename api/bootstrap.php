@@ -1,7 +1,5 @@
 <?php
 
-include_once __DIR__.'/../vendor/autoload.php';
-
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
 
@@ -12,6 +10,7 @@ use Monolog\Handler\StreamHandler;
 try
 {
     // New log channel
+    global $log;
     $log = new Logger('api');
     $log->pushHandler(new StreamHandler(__DIR__.'/../api.log', Level::Debug));
 
@@ -35,6 +34,7 @@ try
     // Since it is required by the exercice, I'm storing them as binary for better optimization, as explained here :
     // https://stitcher.io/blog/optimised-uuids-in-mysql
     $dbHandler->query('CREATE TABLE IF NOT EXISTS users (id binary(36), firstname varchar(255), lastname varchar(255))');
+
 }
 
 catch(PDOException $e)
