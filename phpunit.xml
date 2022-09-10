@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit
-    bootstrap="api/bootstrap.php"
+    bootstrap="vendor/autoload.php"
     printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
     colors="true"
 >
@@ -9,4 +9,7 @@
             <directory>tests/unit</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <server name="REQUEST_URI" value=""/>
+    </php>
 </phpunit>

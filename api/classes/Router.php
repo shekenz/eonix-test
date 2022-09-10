@@ -14,7 +14,7 @@ class Router
     private $dispatcher;
     private $uri;
     
-    public function __construct(array $routes)
+    public function __construct(array $routes = [])
     {
         $this->uri = $this->stripQuery($_SERVER['REQUEST_URI']);
         $this->dispatcher = FastRoute\simpleDispatcher(function(RouteCollector $r) use ($routes) {
@@ -24,7 +24,7 @@ class Router
         });
     }
 
-    protected function stripQuery(string $uri): string
+    public function stripQuery(string $uri): string
     {
         if(false !== $position = strpos($uri, '?')) {
             $uri = substr($uri, 0, $position);
