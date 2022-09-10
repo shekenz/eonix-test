@@ -1,2 +1,5 @@
 #!/usr/bin/env sh
-docker exec -t eonix-test-php php vendor/bin/phpunit $@
+
+source service/.env
+
+docker exec -t ${CONTAINER_PREFIX}-php php vendor/bin/phpunit $@
