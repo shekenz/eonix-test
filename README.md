@@ -13,7 +13,7 @@ This is my coding test (API part) for my interview at Eonix.be
 
 **Note :** Database service is not included. You have to use your own external database service (See next step).
 
-2. Check `.env.example`, edit the database configuration to fit your environment, and save file as `.env`.
+2. Check `.env.example` (at project's root), edit the database configuration to fit your environment, and save file as `.env`.
 
 **Note :** The service should be able to create the database for you, if the user has the `CREATE` privilege.
 
@@ -21,6 +21,8 @@ This is my coding test (API part) for my interview at Eonix.be
 
 ```docker-compose -f service/docker-compose.yml up -d```
 
-4. Run `composer install` (with PHP 8.1)
+4. Run `./composer install`. This will run the `composer` script located at the project's root. It is a shortcut for the composer provided inside the PHP container. You can also use your local composer if it is using PHP 8.1.
 
-5. You should be able to access the api on `localhost:8200/` (Or whatever port you specified in step 1).
+5. [Optional] Run the PHPUnit tests : `.phpunit`. This is also a shortcut script that will run the PHPUnit bin within the PHP container.
+
+6. You should be able to access the api on `localhost:8200/` (Or whatever port you specified in step 1).

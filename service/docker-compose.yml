@@ -17,6 +17,7 @@ services:
         volumes:
             - ../:/var/www
             - ./conf/php/conf.d/extra.ini:/usr/local/etc/php/conf.d/extra.ini:ro
+            - ../.composer.cache:/usr/local/share/composer/cache
         container_name: ${CONTAINER_PREFIX}-php
         networks:
             - default

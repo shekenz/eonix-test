@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+source service/.env
+
+docker exec -it ${CONTAINER_PREFIX}-php composer $@
