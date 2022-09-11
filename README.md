@@ -11,7 +11,7 @@ This is my coding test (API part) for my interview at Eonix.be
 [prefix]-php  # The PHP-fpm container
 ```
 
-**Note :** Database service is not included. You have to use your own external database service (See next step).
+**Note :** Database service is not included. You have to use your own external **MySQL/MariaDB** service.
 
 2. Check `.env.example` (at project's root), edit the database configuration to fit your environment, and save file as `.env`.
 
