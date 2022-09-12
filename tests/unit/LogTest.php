@@ -24,9 +24,18 @@ class LogTest extends TestCase
         $database = new Logger;
     }
 
+    public function testHasMethodLogger(): void
+    {
+        $this->assertTrue(method_exists(Logger::class, 'logger'));
+        $reflection = new ReflectionMethod(Logger::class, 'logger');
+        $this->assertFalse($reflection->isStatic());
+        $this->assertTrue($reflection->isPublic());
+    }
+
     public function testIsInstanceOfLogger(): void
     {
-        $this->assertInstanceOf(Monolog\Logger::class, Logger::logger());
+        $logger = Logger::getInstance();
+        $this->assertInstanceOf(Monolog\Logger::class, $logger->logger());
     }
 
     public function testHasMethodDebug(): void
