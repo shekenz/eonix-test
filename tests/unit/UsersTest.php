@@ -37,9 +37,9 @@ class UsersTest extends TestCase
         $this->assertTrue(method_exists(Users::class, 'delete'));
     }
 
-    public function testIDNotFound(): void
+    public function testIdNotFound(): void
     {
-        $this->users->get('notAnID');
         $this->expectExceptionMessage('User not found.');
+        $this->users->get('notAnID');
     }
 }
