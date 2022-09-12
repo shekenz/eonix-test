@@ -85,12 +85,12 @@ class Database
         {            
             if(isset($e->errorInfo) && $e->errorInfo[1] === 1044)
             {
-                $this->logger->error('Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the CREATE privilege.');
+                $this->logger->emergency('Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the CREATE privilege.');
             }
 
             else
             {
-                $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
+                $this->logger->emergency('Caught unhandled PDOException : '.$e->getMessage());
             }
 
              $this->fatalErrors = true;
@@ -99,14 +99,14 @@ class Database
         // Just in case
         catch(Exception $e)
         {
-            $this->logger->error('Caught unhandled Exception : '.$e->getMessage());
+            $this->logger->emergency('Caught unhandled Exception : '.$e->getMessage());
             $this->fatalErrors = true;
         }
 
         // Never too sure
         catch(Error $e)
         {
-            $this->logger->error('Caught unhandled Error : '.$e->getMessage());
+            $this->logger->emergency('Caught unhandled Error : '.$e->getMessage());
             $this->fatalErrors = true;
         }
 
