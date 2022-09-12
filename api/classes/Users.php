@@ -87,7 +87,11 @@ class Users
             $result[$index]['id'] = bin2hex($user['id']);
         }
         
-        return (count($result) > 1) ? $result : $result[0];
+        // Replace $result with empty array when user id is not found (result === null)
+        (null !== $result) ?: $result = [];
+
+        // If only 1 is in array and we were looking only for 1 user, collapse row
+        return (count($result) == 1 && $id !== '') ? $result[0] : $result;
     }
     
     /**
