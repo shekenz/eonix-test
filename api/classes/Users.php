@@ -63,10 +63,31 @@ class Users
      * @param  mixed $id
      * @return array
      */
-    private function getCallback(int $id = 0): array
+    private function getCallback(string $id = ''): array
     {
-        $this->handler->query('SELECT * FROM users');
-        return [];
+        if($id === '')
+        {
+            $statement = $this->handler->query('SELECT * FROM users');
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        }
+        
+        else
+        {
+            $id = pack('H*', $id); // equivalent of hex2bin()
+
+            $statement = $this->handler->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
+            $statement->bindParam(':id', $id, PDO::PARAM_LOB);
+            $statement->execute();
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        foreach($result as $index => $user)
+        {
+            $result[$index]['id'] = bin2hex($user['id']);
+        }
+        
+        return (count($result) > 1) ? $result : $result[0];
     }
     
     /**
@@ -75,9 +96,10 @@ class Users
      * @param  mixed $id
      * @return array
      */
-    public function get(int $id = 0): array
+    public function get(array $data)
     {
-        return $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
+        $id = $data['id'] ?? '';
+        echo '<pre>'.print_r($this->testDatabase(function() use ($id) { return $this->getCallback($id); }), true).'</pre>';
     }
     
     /**
@@ -86,10 +108,16 @@ class Users
      * @param  mixed $id
      * @return void
      */
-    private function createCallback(int $id = 0): void
+    private function createCallback(string $firstname = 'john', string $lastname = 'doe'): void
     {
         // Creates a new user
-        $this->handler->query();
+        $binGUID = md5(uniqid(rand(), true), true);
+        $statement = $this->handler->prepare('INSERT INTO users(id, firstname, lastname) VALUES (:id, :firstname, :lastname)');
+        $statement->bindParam(':id', $binGUID, \PDO::PARAM_LOB);
+        $statement->bindParam(':firstname', $firstname);
+        $statement->bindParam(':lastname', $lastname);
+        $statement->execute();
+
     }
     
     /**
