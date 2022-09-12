@@ -100,10 +100,12 @@ class Users
      * @param  mixed $id
      * @return array
      */
-    public function get(array $data)
+    public function get(array $data = [])
     {
         $id = $data['id'] ?? '';
-        View::render($this->testDatabase(function() use ($id) { return $this->getCallback($id); }));
+        $result = $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
+
+        View::render($result);
     }
     
     /**
