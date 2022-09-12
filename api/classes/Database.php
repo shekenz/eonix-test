@@ -4,6 +4,7 @@ namespace API;
 
 use PDOException;
 use API\Logger;
+use API\Environement;
 
 /**
  * Database
@@ -20,15 +21,16 @@ class Database
     private function __construct()
     {
         $this->logger = Logger::getInstance();
+        Environement::init();
 
         self::$handler = new \PDO(
             'mysql:host='.$_ENV['DB_HOST'].';
-                   port='.$_ENV['DB_PORT'].';
-                   database='.$_ENV['DB_NAME'].';
-                   charset=utf8mb4',
-                   $_ENV['DB_USER'],
-                   $_ENV['DB_PASSWORD']
-        );
+                    port='.$_ENV['DB_PORT'].';
+                    database='.$_ENV['DB_NAME'].';
+                    charset=utf8mb4',
+                    $_ENV['DB_USER'],
+                    $_ENV['DB_PASSWORD']
+        );        
     }
 
     public static function getInstance(): self
