@@ -114,14 +114,14 @@ class Users
      * @param  mixed $id
      * @return void
      */
-    private function createCallback(string $firstname = 'john', string $lastname = 'doe'): void
+    private function createCallback(): void
     {
         // Creates a new user
         $binGUID = md5(uniqid(rand(), true), true);
         $statement = $this->handler->prepare('INSERT INTO users(id, firstname, lastname) VALUES (:id, :firstname, :lastname)');
         $statement->bindParam(':id', $binGUID, \PDO::PARAM_LOB);
-        $statement->bindParam(':firstname', $firstname);
-        $statement->bindParam(':lastname', $lastname);
+        $statement->bindParam(':firstname', $_POST['firstname']);
+        $statement->bindParam(':lastname', $_POST['lastname']);
         $statement->execute();
 
     }
