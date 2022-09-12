@@ -5,6 +5,8 @@ namespace API;
 use PDOException;
 use API\Logger;
 use API\Environement;
+use Exception;
+use Error;
 
 /**
  * Database
@@ -17,10 +19,13 @@ class Database
     private static $instance;
     private static $handler;
     private $logger;
+    private $fatalErrors;
 
     private function __construct()
     {
         $this->logger = Logger::getInstance();
+        $this->fatalErrors = false;
+
         Environement::init();
 
         self::$handler = new \PDO(
@@ -41,12 +46,26 @@ class Database
       
         return self::$instance;
     }
-
+    
+    /**
+     * handler
+     *
+     * Getter for the PDO handler
+     * 
+     * @return PDO
+     */
     public function handler(): \PDO
     {
         return self::$handler;
     }
-
+    
+    /**
+     * init
+     *
+     * Tries to create the database and table
+     * 
+     * @return void
+     */
     public function init(): void
     {
         try
@@ -74,7 +93,30 @@ class Database
                 $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
             }
 
-            // TODO Return an HTTP 500
+             $this->fatalErrors = true;
+        }
+
+        // Just in case
+        catch(Exception $e)
+        {
+            $this->logger->error('Caught unhandled Exception : '.$e->getMessage());
+            $this->fatalErrors = true;
+        }
+
+        // Never too sure
+        catch(Error $e)
+        {
+            $this->logger->error('Caught unhandled Error : '.$e->getMessage());
+            $this->fatalErrors = true;
+        }
+
+        finally
+        {
+            if(true === $this->fatalErrors)
+            {
+                header("HTTP/1.1 500 Internal Server Error");
+                die(); // (8E
+            }
         }
     }
 }
