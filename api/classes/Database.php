@@ -28,14 +28,32 @@ class Database
 
         Environement::init();
 
-        self::$handler = new \PDO(
-            'mysql:host='.$_ENV['DB_HOST'].';
-                    port='.$_ENV['DB_PORT'].';
-                    database='.$_ENV['DB_NAME'].';
-                    charset=utf8mb4',
-                    $_ENV['DB_USER'],
-                    $_ENV['DB_PASSWORD']
-        );        
+        try
+        {
+            self::$handler = new \PDO(
+                'mysql:host='.$_ENV['DB_HOST'].';
+                       port='.$_ENV['DB_PORT'].';
+                       charset=utf8mb4',
+                       $_ENV['DB_USER'],
+                       $_ENV['DB_PASSWORD']
+            );
+
+            // Using database
+            self::$handler->exec('USE `'.$_ENV['DB_NAME'].'`');
+        }
+        
+        catch(PDOException $e)
+        {
+            if(isset($e->errorInfo) && $e->errorInfo[1] === 1049) // Error 1049 : Unknown database
+            {
+                $this->init();
+            }
+
+            else
+            {
+                $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
+            }
+        }
     }
 
     public static function getInstance(): self
@@ -66,24 +84,45 @@ class Database
      * 
      * @return void
      */
-    public function init(): void
+    public function init(string $type = 'all'): void
     {
         try
         {
-            self::$handler->exec(
-                'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'`'.
-                '; USE `'.$_ENV['DB_NAME'].'`'.
-                '; CREATE TABLE IF NOT EXISTS users (id binary(36), firstname varchar(255), lastname varchar(255))'
-            );
-            // More info on why I used binary(36) for GUID
-            // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
-            // https://stitcher.io/blog/optimised-uuids-in-mysql
-            $this->logger->info('Created database '.$_ENV['DB_NAME']);
+            $query = '';
+            $successMessage = '';
+
+            switch($type)
+            {   
+                case 'table': // Create only the missing table
+                    // More info on why I used binary(16) for GUID
+                    // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
+                    // https://stitcher.io/blog/optimised-uuids-in-mysql
+                    $query = 'CREATE TABLE IF NOT EXISTS users (id binary(16), firstname varchar(255), lastname varchar(255))';
+                    $successMessage = 'Created table users';
+                    break;
+
+                case 'database': // Create only the missing database
+                    $query = 'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'`; USE `'.$_ENV['DB_NAME'].'`';
+                    $successMessage = 'Created database '.$_ENV['DB_NAME'];
+                    break;
+
+                case 'all':
+                default :
+                    $query = 'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'`'.
+                             '; USE `'.$_ENV['DB_NAME'].'`'.
+                             '; CREATE TABLE IF NOT EXISTS users (id binary(16), firstname varchar(255), lastname varchar(255))';
+                    $successMessage = 'Created database '.$_ENV['DB_NAME'].' and table users in one query';
+            }
+
+            self::$handler->exec($query);
+            $this->logger->info($successMessage);
         }
 
         catch(PDOException $e)
         {            
-            if(isset($e->errorInfo) && $e->errorInfo[1] === 1044)
+            if(isset($e->errorInfo) && ($e->errorInfo[1] === 1044 || $e->errorInfo[1] === 1142))
+            // Error 1044 Access denied for user
+            // Error 1142 : CREATE command denied to user
             {
                 $this->logger->emergency('Cannot access database "'.$_ENV['DB_NAME'].'" with user "'.$_ENV['DB_USER'].'". Make sure the database exists or that the user has the CREATE privilege.');
             }

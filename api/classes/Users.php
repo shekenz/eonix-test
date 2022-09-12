@@ -4,7 +4,9 @@ namespace API;
 
 use API\Database;
 use API\Logger;
+use Exception;
 use PDOException;
+use PDO;
 
 class Users
 {
@@ -23,10 +25,10 @@ class Users
      * testDatabase
      *
      * This method tries to execute a $callback (which executes an SQL statement).
-     * If the database does not exist, we try to create it with Database->init() method,
-     * and execute the callback again. Database->init() will send an error 500 and kill
-     * the script if it cannot create the database (and the table).
-     * This allows us to try to create missing database only if needed, so we avoid checking
+     * If the table does not exist, we try to create it with Database->init('table') method,
+     * and execute the callback again. Database->init() will send an error 500 and kill the
+     * script if it cannot create the table.
+     * This allows us to try to create missing table only when needed, so we avoid checking
      * for it at every client requests.
      * 
      * @param  mixed $callback
@@ -41,9 +43,9 @@ class Users
 
         catch(PDOException $e)
         {
-            if(isset($e->errorInfo) && $e->errorInfo[1] === 1046) // Error 1046 : No database selected
+            if(isset($e->errorInfo) && $e->errorInfo[1] === 1146) // Error 1146 : Base table or view not found
             {
-                $this->db->init();
+                $this->db->init('table');
                 // Retry query after initiating db
                 return $callback();
             }
