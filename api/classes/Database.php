@@ -52,13 +52,14 @@ class Database
         try
         {
             self::$handler->exec(
-                'CREATE DATABASE IF NOT EXISTS '.$_ENV['DB_NAME'].
-                '; USE '.$_ENV['DB_NAME'].
+                'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'`'.
+                '; USE `'.$_ENV['DB_NAME'].'`'.
                 '; CREATE TABLE IF NOT EXISTS users (id binary(36), firstname varchar(255), lastname varchar(255))'
             );
             // More info on why I used binary(36) for GUID
             // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
             // https://stitcher.io/blog/optimised-uuids-in-mysql
+            $this->logger->info('Created database '.$_ENV['DB_NAME']);
         }
 
         catch(PDOException $e)
