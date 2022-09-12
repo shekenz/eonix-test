@@ -6,6 +6,8 @@ use FastRoute;
 use FastRoute\RouteCollector;
 use FastRoute\Dispatcher;
 
+use API\View;
+
 /**
  * Router
  */
@@ -38,8 +40,8 @@ class Router
         $route = $this->dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $this->uri);
         switch($route[0])
         {
-            case Dispatcher::NOT_FOUND: echo '404'; break;
-            case Dispatcher::METHOD_NOT_ALLOWED: echo '405'; break;
+            case Dispatcher::NOT_FOUND: View::badGateway(); break;
+            case Dispatcher::METHOD_NOT_ALLOWED: View::methodNotAllowed(); break;
             case Dispatcher::FOUND: $route[1]($route[2]); break;
         }
     }

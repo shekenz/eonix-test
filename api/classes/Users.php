@@ -103,7 +103,7 @@ class Users
     public function get(array $data)
     {
         $id = $data['id'] ?? '';
-        echo '<pre>'.print_r($this->testDatabase(function() use ($id) { return $this->getCallback($id); }), true).'</pre>';
+        View::render($this->testDatabase(function() use ($id) { return $this->getCallback($id); }));
     }
     
     /**
