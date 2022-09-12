@@ -97,7 +97,7 @@ class Database
                     // More info on why I used binary(16) for GUID
                     // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
                     // https://stitcher.io/blog/optimised-uuids-in-mysql
-                    $query = 'CREATE TABLE IF NOT EXISTS users (id binary(16), firstname varchar(255), lastname varchar(255))';
+                    $query = 'CREATE TABLE IF NOT EXISTS users (id binary(16) PRIMARY KEY, firstname varchar(255), lastname varchar(255))';
                     $successMessage = 'Created table users';
                     break;
 
@@ -110,7 +110,7 @@ class Database
                 default :
                     $query = 'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'`'.
                              '; USE `'.$_ENV['DB_NAME'].'`'.
-                             '; CREATE TABLE IF NOT EXISTS users (id binary(16), firstname varchar(255), lastname varchar(255))';
+                             '; CREATE TABLE IF NOT EXISTS users (id binary(16) PRIMARY KEY, firstname varchar(255), lastname varchar(255))';
                     $successMessage = 'Created database '.$_ENV['DB_NAME'].' and table users in one query';
             }
 
