@@ -26,7 +26,7 @@ class Environement
             $this->logger->emergency($e->getMessage());
             $this->logger->info('Make sure you copied .env.example to .env and correctly edited it.');
 
-            // TODO return HTTP 500
+            header("HTTP/1.1 500 Internal Server Error");
             die();
         }
     }
