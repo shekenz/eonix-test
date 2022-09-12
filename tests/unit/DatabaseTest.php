@@ -19,7 +19,15 @@ class DatabaseTest extends TestCase
         $this->assertTrue($reflection->isPublic());
     }
 
-    public function testHandlerIsPDO(): void
+    public function testHasMethodInit(): void
+    {
+        $this->assertTrue(method_exists(Database::class, 'init'));
+        $reflection = new ReflectionMethod(Database::class, 'init');
+        $this->assertFalse($reflection->isStatic());
+        $this->assertTrue($reflection->isPublic());
+    }
+
+    public function testHandlerIsInstanceOfPdo(): void
     {
         $database = Database::getInstance();
         $this->assertInstanceOf(PDO::class, $database->handler());
