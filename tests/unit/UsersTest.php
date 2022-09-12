@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use API\Users;
+use API\View;
 
 class UsersTest extends TestCase
 {
@@ -31,13 +32,14 @@ class UsersTest extends TestCase
 
     public function testGetReturnsArray(): void
     {
+        // TODO Create a mock of View::render that pass through the data array
         $this->assertIsArray($this->users->get());
     }
 
-    public function testIdIsNotIntException(): void
+    public function testDataIsNotAnArrayException(): void
     {
         $this->expectError(TypeError::class);
-        $this->users->get('notAnID');
+        $this->users->get('notAnArray');
     }
     
     /**
