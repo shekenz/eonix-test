@@ -52,7 +52,7 @@ class Database
 
             else
             {
-                $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
+                $this->logger->emergency('Caught unhandled PDOException : '.$e->getMessage());
                 View::serverError(true);
             }
         }
