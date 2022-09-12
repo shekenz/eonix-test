@@ -5,6 +5,7 @@ namespace API;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
 use API\Logger;
+use API\View;
 
 class Environement
 {
@@ -26,8 +27,7 @@ class Environement
             $this->logger->emergency($e->getMessage());
             $this->logger->info('Make sure you copied .env.example to .env and correctly edited it.');
 
-            header("HTTP/1.1 500 Internal Server Error");
-            die();
+            View::serverError(true);
         }
     }
     

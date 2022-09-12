@@ -5,6 +5,7 @@ namespace API;
 use PDOException;
 use API\Logger;
 use API\Environement;
+use API\View;
 use Exception;
 use Error;
 
@@ -52,6 +53,7 @@ class Database
             else
             {
                 $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
+                View::serverError(true);
             }
         }
     }
@@ -153,8 +155,7 @@ class Database
         {
             if(true === $this->fatalErrors)
             {
-                header("HTTP/1.1 500 Internal Server Error");
-                die(); // (8E
+                View::serverError(true);
             }
         }
     }
