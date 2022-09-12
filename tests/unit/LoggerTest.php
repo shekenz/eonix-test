@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use API\Logger;
 
-class LogTest extends TestCase
+class LoggerTest extends TestCase
 {
     public function testRootIsWritable(): void
     {
