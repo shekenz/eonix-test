@@ -11,7 +11,12 @@ class UsersTest extends TestCase
     {
         $this->users = new Users();
     }
-
+    
+    /**
+     * testHasMethodGet
+     *
+     * @return void
+     */
     public function testHasMethodGet(): void
     {
         $this->assertTrue(method_exists(Users::class, 'get'));
@@ -29,6 +34,17 @@ class UsersTest extends TestCase
         $this->assertIsArray($this->users->get());
     }
 
+    public function testIdIsNotIntException(): void
+    {
+        $this->expectError(TypeError::class);
+        $this->users->get('notAnID');
+    }
+    
+    /**
+     * testHasMethodCreate
+     *
+     * @return void
+     */
     public function testHasMethodCreate(): void
     {
         $this->assertTrue(method_exists(Users::class, 'create'));
@@ -40,7 +56,12 @@ class UsersTest extends TestCase
         $reflexion = new ReflectionMethod(Users::class, 'createCallback');
         $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
     }
-
+    
+    /**
+     * testHasMethodUpdate
+     *
+     * @return void
+     */
     public function testHasMethodUpdate(): void
     {
         $this->assertTrue(method_exists(Users::class, 'update'));
@@ -53,6 +74,17 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'updateCallback should be private');
     }
 
+    public function testUpdateEmptyIdException(): void
+    {
+        $this->expectException(Exception::class);
+        $this->users->update();
+    }
+    
+    /**
+     * testHasMethodDelete
+     *
+     * @return void
+     */
     public function testHasMethodDelete(): void
     {
         $this->assertTrue(method_exists(Users::class, 'delete'));
@@ -65,9 +97,9 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'deleteCallback should be private');
     }
 
-    public function testIdNotFound(): void
+    public function testDeleteEmptyIdException(): void
     {
-        $this->expectExceptionMessage('User not found.');
-        $this->users->get('notAnID');
+        $this->expectException(Exception::class);
+        $this->users->delete();
     }
 }
