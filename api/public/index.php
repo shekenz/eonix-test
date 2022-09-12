@@ -1,8 +1,8 @@
 <?php
 
-use API\Router;
-
 require_once __DIR__.'/../../vendor/autoload.php';
+
+use API\Router;
 
 $routes = [
     ['GET', '/users', function() { echo 'Getting list of user filtered by firstname or lastname'; } ],
