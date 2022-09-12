@@ -96,6 +96,9 @@ class Database
             switch($type)
             {   
                 case 'table': // Create only the missing table
+
+                    // TODO Check if it is better to add index on firstname and lastname. I think so.
+
                     // More info on why I used binary(16) for GUID
                     // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
                     // https://stitcher.io/blog/optimised-uuids-in-mysql

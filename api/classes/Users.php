@@ -4,7 +4,6 @@ namespace API;
 
 use API\Database;
 use API\Logger;
-use Exception;
 use PDOException;
 use PDO;
 
@@ -123,6 +122,8 @@ class Users
         $statement->bindParam(':firstname', $_POST['firstname']);
         $statement->bindParam(':lastname', $_POST['lastname']);
         $statement->execute();
+
+        // TODO Return error if data is missing
 
     }
     
