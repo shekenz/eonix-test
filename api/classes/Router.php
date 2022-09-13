@@ -40,7 +40,7 @@ class Router
         $route = $this->dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $this->uri);
         switch($route[0])
         {
-            case Dispatcher::NOT_FOUND: View::badGateway(); break;
+            case Dispatcher::NOT_FOUND: View::notFound(); break;
             case Dispatcher::METHOD_NOT_ALLOWED: View::methodNotAllowed(); break;
             case Dispatcher::FOUND: $route[1]($route[2]); break;
         }
