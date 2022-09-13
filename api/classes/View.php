@@ -42,7 +42,7 @@ class View
         header('Content-Type: application/json; charset=utf-8');
     }
 
-    public static function serverError(bool $die = false): void
+    public static function serverError(bool $die = true): void
     {
         header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
         header('Content-Type: application/json; charset=utf-8');

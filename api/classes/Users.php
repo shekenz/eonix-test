@@ -52,6 +52,7 @@ class Users
             else
             {
                 $this->logger->error('Caught unhandled PDOException : '.$e->getMessage());
+                View::serverError();
             }
         }
     }

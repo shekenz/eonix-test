@@ -26,8 +26,7 @@ class Environement
         {
             $this->logger->emergency($e->getMessage());
             $this->logger->info('Make sure you copied .env.example to .env and correctly edited it.');
-
-            View::serverError(true);
+            View::serverError();
         }
     }
     
