@@ -35,9 +35,11 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'getCallback should be private');
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGetReturnsArray(): void
     {
-        // TODO Mock View method to prevent 'header already sent' error
         $this->users->get();
         $this->assertIsArray($this->users->getData());
     }
@@ -65,10 +67,12 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testCreateReturnsArray(): void
     {
         // TODO Mock POST data
-        // TODO Mock View method to prevent 'header already sent' error
         $this->users->create();
         $this->assertIsArray($this->users->getData());
     }
@@ -96,10 +100,12 @@ class UsersTest extends TestCase
         $this->users->update();
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testUpdateReturnsArray(): void
     {
         // TODO Mock database, ID and POST data
-        // TODO Mock View method to prevent 'header already sent' error
         $this->users->update(['id' => 'id']);
         $this->assertIsArray($this->users->getData());
     }
