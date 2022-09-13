@@ -135,7 +135,8 @@ class Users
     {
         $id = $data['id'] ?? '';
         $result = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
-        return View::buffer($result);
+
+        return (empty($result)) ? View::notFound() : View::buffer($result);
     }
     
     /**
@@ -244,7 +245,7 @@ class Users
      *
      * @return void
      */
-    public function delete()
+    public function delete(): void
     {
         $this->testDatabase([$this, 'deleteCallback']);
     }

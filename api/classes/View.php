@@ -12,18 +12,15 @@ class View
 
     public static function buffer(array $data): array
     {
-        if(count($data) > 0)
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 200 OK');
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+        
+        if(!empty($data))
         {
-            array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 200 OK');
-            array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
             self::$buffer = json_encode($data);
-            return $data;
         }
 
-        else
-        {
-            self::notFound();
-        }
+        return $data;
     }
 
     public static function error(array $messages, bool $die = true): void
@@ -80,7 +77,7 @@ class View
         }
 
         echo self::$buffer;
-        
+
         exit();
 
     }
