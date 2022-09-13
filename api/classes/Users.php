@@ -12,7 +12,6 @@ class Users
     private $db;
     private $handler;
     private $logger;
-    private $receivedData;
 
     public function __construct()
     {
@@ -90,19 +89,6 @@ class Users
     }
     
     /**
-     * getData
-     * 
-     * Returns the previously fetched data, which represent the data before calling the View class.
-     * This is usefull to test the data.
-     *
-     * @return void
-     */
-    public function getData()
-    {
-        return $this->receivedData;
-    }
-    
-    /**
      * getCallback
      *
      * @param  mixed $id
@@ -148,8 +134,8 @@ class Users
     public function get(array $data = []): array
     {
         $id = $data['id'] ?? '';
-        $this->receivedData = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
-        return View::buffer($this->receivedData);
+        $result = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
+        return View::buffer($result);
     }
     
     /**
@@ -185,8 +171,8 @@ class Users
      */
     public function create(): array
     {
-        $this->receivedData = (array) $this->testDatabase([$this, 'createCallback']);
-        return View::buffer($this->receivedData);
+        $result = (array) $this->testDatabase([$this, 'createCallback']);
+        return View::buffer($result);
     }
     
     /**
@@ -239,8 +225,8 @@ class Users
      */
     public function update(array $data): array
     {
-        $this->receivedData = (array) $this->testDatabase(function() use ($data) { return $this->updateCallback($data['id']); });
-        return View::buffer($this->receivedData);
+        $result = (array) $this->testDatabase(function() use ($data) { return $this->updateCallback($data['id']); });
+        return View::buffer($result);
     }
     
     /**

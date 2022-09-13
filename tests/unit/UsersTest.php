@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use API\Users;
-use API\View;
 
 class UsersTest extends TestCase
 {
@@ -11,11 +10,7 @@ class UsersTest extends TestCase
     public function setUp(): void
     {
         $this->users = new Users();
-    }
 
-    public function testHasMethodGetData(): void
-    {
-        $this->assertTrue(method_exists(Users::class, 'getData'));
     }
     
     /**
@@ -37,8 +32,7 @@ class UsersTest extends TestCase
 
     public function testGetReturnsArray(): void
     {
-        $this->users->get();
-        $this->assertIsArray($this->users->getData());
+        $this->assertIsArray($this->users->get());
     }
 
     public function testDataIsNotAnArrayException(): void
@@ -68,8 +62,7 @@ class UsersTest extends TestCase
     {
         $_POST['firstname'] = 'Jhon';
         $_POST['lastname'] = 'Doe';
-        $this->users->create();
-        $this->assertIsArray($this->users->getData());
+        $this->assertIsArray($this->users->create());
     }
     
     /**
@@ -91,15 +84,15 @@ class UsersTest extends TestCase
 
     public function testUpdateEmptyIdException(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(ArgumentCountError::class);
         $this->users->update();
     }
 
     public function testUpdateReturnsArray(): void
     {
-        // TODO Mock database, ID and POST data
-        $this->users->update(['id' => md5(uniqid(rand(), true))]);
-        $this->assertIsArray($this->users->getData());
+        $_POST['firstname'] = 'Jhon';
+        $_POST['lastname'] = 'Doe';
+        $this->assertIsArray($this->users->update(['id' => md5(uniqid(rand(), true))]));
     }
     
     /**
@@ -121,7 +114,7 @@ class UsersTest extends TestCase
 
     public function testDeleteEmptyIdException(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(ArgumentCountError::class);
         $this->users->delete();
     }
 }
