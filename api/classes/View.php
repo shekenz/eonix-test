@@ -7,13 +7,17 @@ namespace API;
  */
 class View
 {
-    public static function render(array $data): void
+    private static $headers = [];
+    private static $buffer;
+
+    public static function buffer(array $data): array
     {
         if(count($data) > 0)
         {
-            header($_SERVER['SERVER_PROTOCOL'].' 200 OK');
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode($data);
+            array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 200 OK');
+            array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+            self::$buffer = json_encode($data);
+            return $data;
         }
 
         else
@@ -24,35 +28,60 @@ class View
 
     public static function error(array $messages, bool $die = true): void
     {
-        header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['errors' => $messages]);
-        if($die) { die(); }
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+        self::$buffer = json_encode(['errors' => $messages]);
+
+        if($die)
+        {
+            self::render();
+        }
     }
 
     public static function notFound(bool $die = true): void
     {
-        header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
-        header('Content-Type: application/json; charset=utf-8');
-        if($die) { die(); }
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+
+        if($die)
+        {
+            self::render();
+        }
     }
 
     public static function methodNotAllowed(): void
     {
-        header($_SERVER['SERVER_PROTOCOL'].' 405 Method Not Allowed');
-        header('Content-Type: application/json; charset=utf-8');
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 405 Method Not Allowed');
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
     }
 
     public static function serverError(bool $die = true): void
     {
-        header($_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
-        header('Content-Type: application/json; charset=utf-8');
-        if($die) { die(); }
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 500 Internal Server Error');
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+        
+        if($die)
+        {
+            self::render();
+        }
     }
 
     public static function badGateway(): void
     {
-        header($_SERVER['SERVER_PROTOCOL']." 502 Bad Gateway");
-        header('Content-Type: application/json; charset=utf-8');
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL']." 502 Bad Gateway");
+        array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+    }
+
+    public static function render(): void
+    {
+        foreach(self::$headers as $header)
+        {
+            header($header);
+        }
+
+        echo self::$buffer;
+        
+        exit();
+
     }
 }

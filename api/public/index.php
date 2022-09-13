@@ -6,6 +6,7 @@ require_once __DIR__.'/../../vendor/autoload.php';
 
 use API\Router;
 use API\Users;
+use API\View;
 
 $users = new Users;
 
@@ -21,3 +22,5 @@ $routes = [
 
 $router = new Router($routes);
 $router->dispatch();
+
+View::render();

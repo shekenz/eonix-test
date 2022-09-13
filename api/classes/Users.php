@@ -119,7 +119,7 @@ class Users
         
         else
         {
-            $id = pack('H*', $id); // equivalent of hex2bin()
+            $id = hex2bin($id);
 
             $statement = $this->handler->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
             $statement->bindParam(':id', $id, PDO::PARAM_LOB);
@@ -145,11 +145,11 @@ class Users
      * @param  mixed $id
      * @return array
      */
-    public function get(array $data = [])
+    public function get(array $data = []): array
     {
         $id = $data['id'] ?? '';
         $this->receivedData = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
-        View::render($this->receivedData);
+        return View::buffer($this->receivedData);
     }
     
     /**
@@ -181,12 +181,12 @@ class Users
     /**
      * create wrapper
      *
-     * @return void
+     * @return array
      */
-    public function create(): void
+    public function create(): array
     {
         $this->receivedData = (array) $this->testDatabase([$this, 'createCallback']);
-        View::render($this->receivedData);
+        return View::buffer($this->receivedData);
     }
     
     /**
@@ -216,7 +216,7 @@ class Users
             View::notFound();
         }
 
-        $binId = pack('H*', $id);
+        $binId = hex2bin($id);
 
         $statement = $this->handler->prepare('UPDATE users SET firstname = :firstname, lastname = :lastname WHERE id = :id');
         $statement->bindParam(':id', $binId, \PDO::PARAM_LOB);
@@ -237,10 +237,10 @@ class Users
      *
      * @return void
      */
-    public function update(array $data): void
+    public function update(array $data): array
     {
         $this->receivedData = (array) $this->testDatabase(function() use ($data) { return $this->updateCallback($data['id']); });
-        View::render($this->receivedData);
+        return View::buffer($this->receivedData);
     }
     
     /**
