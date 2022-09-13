@@ -10,11 +10,11 @@ class View
     private static $headers = [];
     private static $buffer;
 
-    public static function buffer(array $data): array
+    public static function buffer(array $data = []): array
     {
         array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 200 OK');
         array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
-        
+
         if(!empty($data))
         {
             self::$buffer = json_encode($data);
@@ -23,11 +23,15 @@ class View
         return $data;
     }
 
-    public static function error(array $messages, bool $die = true): void
+    public static function error(array $messages = [], bool $die = true): void
     {
         array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
         array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
-        self::$buffer = json_encode(['errors' => $messages]);
+        
+        if(!empty($data))
+        {
+            self::$buffer = json_encode(['errors' => $messages]);
+        }
 
         if($die)
         {

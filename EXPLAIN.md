@@ -1,0 +1,6 @@
+- update methode POST au lieu de PUT/PATCH pasque j'avais vraiment pas le temps de parser file_get_contents('php://input') quand on post multipart/form-data
+- id en binary(16)
+- dans la classe view, pas d'utilisation d'output buffer car sinon phpunit marquais les tests comme risky
+- il aurrait fallut faire un validator
+- il aurrait fallut faire un query builder
+- construction de la db pour la resilience
