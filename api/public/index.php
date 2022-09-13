@@ -1,7 +1,5 @@
 <?php
 
-// TODO author and description in composer.json
-
 require_once __DIR__.'/../../vendor/autoload.php';
 
 use API\Router;

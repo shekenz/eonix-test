@@ -1,5 +1,15 @@
 {
     "name" : "shekenz/eonix-test",
+    "authors": [
+        {
+            "name": "Aurel Trotebas",
+            "email": "aureltrotebas@icloud.com",
+            "role": "Developer"
+        }
+    ],
+    "description" : "A test API for my job interview at Eonix",
+    "type": "project",
+    "license": "GPL-3.0",
     "require" : {
         "vlucas/phpdotenv" : "^5.4",
         "nikic/fast-route" : "^1.3",
