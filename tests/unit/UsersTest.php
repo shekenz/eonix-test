@@ -35,9 +35,6 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'getCallback should be private');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testGetReturnsArray(): void
     {
         $this->users->get();
@@ -67,12 +64,10 @@ class UsersTest extends TestCase
         $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testCreateReturnsArray(): void
     {
-        // TODO Mock POST data
+        $_POST['firstname'] = 'Jhon';
+        $_POST['lastname'] = 'Doe';
         $this->users->create();
         $this->assertIsArray($this->users->getData());
     }
@@ -100,13 +95,10 @@ class UsersTest extends TestCase
         $this->users->update();
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testUpdateReturnsArray(): void
     {
         // TODO Mock database, ID and POST data
-        $this->users->update(['id' => 'id']);
+        $this->users->update(['id' => md5(uniqid(rand(), true))]);
         $this->assertIsArray($this->users->getData());
     }
     
