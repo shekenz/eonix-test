@@ -136,7 +136,15 @@ class Users
         $id = $data['id'] ?? '';
         $result = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
 
-        return (empty($result)) ? View::notFound() : View::buffer($result);
+        if(empty($result))
+        {
+            View::notFound(false);
+            return [];
+        }
+        
+        else {
+            return View::buffer($result);
+        }
     }
     
     /**
