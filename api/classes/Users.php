@@ -12,6 +12,7 @@ class Users
     private $db;
     private $handler;
     private $logger;
+    private $receivedData;
 
     public function __construct()
     {
@@ -191,11 +192,44 @@ class Users
     /**
      * updateCallback
      *
-     * @return boolean
+     * @return array
      */
-    private function updateCallback()
+    private function updateCallback(string $id): array
     {
-        $this->handler->query();
+        // NB: Router enforce the presence of a 16 bytes GUID
+        $user = $this->getCallback($id);
+        
+        // Validation
+        $this->validatePostData(false);
+
+        // Preparing data to update
+        // Would be better to create a query builder but I have no time for that
+        if(!empty($user))
+        {
+            // Post data is opional
+            $firstname = $_POST['firstname'] ?? $user['firstname'];
+            $lastname = $_POST['lastname'] ?? $user['lastname'];
+        } 
+    
+        else
+        {
+            View::notFound();
+        }
+
+        $binId = pack('H*', $id);
+
+        $statement = $this->handler->prepare('UPDATE users SET firstname = :firstname, lastname = :lastname WHERE id = :id');
+        $statement->bindParam(':id', $binId, \PDO::PARAM_LOB);
+        $statement->bindParam(':firstname', $firstname);
+        $statement->bindParam(':lastname', $lastname);
+        $statement->execute();
+
+        return [            
+            'id' => $id,
+            'firstname' => $firstname,
+            'lastname' => $lastname
+        ];
+
     }
     
     /**
@@ -203,9 +237,10 @@ class Users
      *
      * @return void
      */
-    public function update()
+    public function update(array $data): void
     {
-        $this->testDatabase([$this, 'updatedCallback']);
+        $this->receivedData = (array) $this->testDatabase(function() use ($data) { return $this->updateCallback($data['id']); });
+        View::render($this->receivedData);
     }
     
     /**
