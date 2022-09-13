@@ -2,6 +2,9 @@
 
 namespace API;
 
+/**
+ * View
+ */
 class View
 {
     public static function render(array $data): void
@@ -19,7 +22,15 @@ class View
         }
     }
 
-    public static function notFOund(): void
+    public static function error(array $messages, bool $die = true): void
+    {
+        header($_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['errors' => $messages]);
+        if($die) { die(); }
+    }
+
+    public static function notFound(): void
     {
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
         header('Content-Type: application/json; charset=utf-8');
