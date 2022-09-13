@@ -12,6 +12,11 @@ class UsersTest extends TestCase
     {
         $this->users = new Users();
     }
+
+    public function testHasMethodGetData(): void
+    {
+        $this->assertTrue(method_exists(Users::class, 'getData'));
+    }
     
     /**
      * testHasMethodGet
@@ -32,8 +37,9 @@ class UsersTest extends TestCase
 
     public function testGetReturnsArray(): void
     {
-        // TODO Create a mock of View::render that pass through the data array
-        $this->assertIsArray($this->users->get());
+        // TODO Mock View method to prevent 'header already sent' error
+        $this->users->get();
+        $this->assertIsArray($this->users->getData());
     }
 
     public function testDataIsNotAnArrayException(): void
@@ -58,6 +64,14 @@ class UsersTest extends TestCase
         $reflexion = new ReflectionMethod(Users::class, 'createCallback');
         $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
     }
+
+    public function testCreateReturnsArray(): void
+    {
+        // TODO Mock POST data
+        // TODO Mock View method to prevent 'header already sent' error
+        $this->users->create();
+        $this->assertIsArray($this->users->getData());
+    }
     
     /**
      * testHasMethodUpdate
@@ -80,6 +94,14 @@ class UsersTest extends TestCase
     {
         $this->expectException(Exception::class);
         $this->users->update();
+    }
+
+    public function testUpdateReturnsArray(): void
+    {
+        // TODO Mock database, ID and POST data
+        // TODO Mock View method to prevent 'header already sent' error
+        $this->users->update(['id' => 'id']);
+        $this->assertIsArray($this->users->getData());
     }
     
     /**
