@@ -116,8 +116,15 @@ class Users
     private function createCallback(): array
     {
         // Stripping invisible characters
-        $_POST['firstname'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']);
-        $_POST['lastname'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']);
+        if (array_key_exists('firstname', $_POST))
+        {
+            $_POST['firstname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']));
+        }
+
+        if (array_key_exists('lastname', $_POST))
+        {
+            $_POST['lastname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']));
+        }
 
         // Data validation
         $errors = [];
