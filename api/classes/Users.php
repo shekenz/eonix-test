@@ -58,6 +58,36 @@ class Users
     }
     
     /**
+     * validatePostData
+     * 
+     * Trims firstname and last name from empty spaces and invisible characters,
+     * and send a Error view if one of them is empty
+     *
+     * @return void
+     */
+    private function validatePostData(bool $strict = true): void
+    {
+        // Stripping invisible characters
+        if (array_key_exists('firstname', $_POST))
+        {
+            $_POST['firstname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']));
+        }
+
+        if (array_key_exists('lastname', $_POST))
+        {
+            $_POST['lastname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']));
+        }
+
+        // Data validation
+        if ($strict)
+        {
+            $errors = [];
+            if(empty($_POST['firstname'])) { array_push($errors, 'Firstname is required'); }
+            if(empty($_POST['lastname'])) { array_push($errors, 'Lastname is required'); }
+            if(!empty($errors)) { View::error($errors); }
+        }
+    }
+    /**
      * getCallback
      *
      * @param  mixed $id
@@ -111,26 +141,12 @@ class Users
      * createCallback
      *
      * @param  mixed $id
-     * @return void
+     * @return array
      */
     private function createCallback(): array
     {
-        // Stripping invisible characters
-        if (array_key_exists('firstname', $_POST))
-        {
-            $_POST['firstname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']));
-        }
-
-        if (array_key_exists('lastname', $_POST))
-        {
-            $_POST['lastname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']));
-        }
-
-        // Data validation
-        $errors = [];
-        if(empty($_POST['firstname'])) { array_push($errors, 'Firstname is required'); }
-        if(empty($_POST['lastname'])) { array_push($errors, 'Lastname is required'); }
-        if(!empty($errors)) { View::error($errors); }
+        // Validation
+        $this->validatePostData();
 
         // Creates a new user
         $binGUID = md5(uniqid(rand(), true), true);
