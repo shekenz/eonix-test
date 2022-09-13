@@ -104,7 +104,6 @@ class Users
     {
         $id = $data['id'] ?? '';
         $result = $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
-
         View::render($result);
     }
     
@@ -114,8 +113,12 @@ class Users
      * @param  mixed $id
      * @return void
      */
-    private function createCallback(): void
+    private function createCallback(): array
     {
+        // Stripping invisible characters
+        $_POST['firstname'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']);
+        $_POST['lastname'] = preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']);
+
         // Data validation
         $errors = [];
         if(empty($_POST['firstname'])) { array_push($errors, 'Firstname is required'); }
