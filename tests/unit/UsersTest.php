@@ -5,12 +5,44 @@ use API\Users;
 
 class UsersTest extends TestCase
 {
-    private $users;
+    private static $users;
+    private static $mockUser;
 
-    public function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        $this->users = new Users();
+        self::$users = new Users();
+    }
 
+    /**
+     * testHasMethodCreate
+     *
+     * @return void
+     */
+    public function testHasMethodCreate(): void
+    {
+        $this->assertTrue(method_exists(Users::class, 'create'));
+    }
+
+    public function testHasMethodCreateCallback(): void
+    {
+        $this->assertTrue(method_exists(Users::class, 'createCallback'));
+        $reflexion = new ReflectionMethod(Users::class, 'createCallback');
+        $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
+    }
+
+    public function testCreateReturnsArray(): void
+    {
+        $_POST['firstname'] = 'Test created firstname';
+        $_POST['lastname'] = 'Test created lastname';
+        self::$mockUser = self::$users->create();
+        $this->assertIsArray(self::$mockUser);
+    }
+
+    public function testUserCreated(): void
+    {
+        $this->assertMatchesRegularExpression('/[a-f0-9]{32}/', self::$mockUser['id']);
+        $this->assertEquals('Test created firstname', self::$mockUser['firstname']);
+        $this->assertEquals('Test created lastname', self::$mockUser['lastname']);
     }
     
     /**
@@ -32,37 +64,13 @@ class UsersTest extends TestCase
 
     public function testGetReturnsArray(): void
     {
-        $this->assertIsArray($this->users->get());
+        $this->assertIsArray(self::$users->get());
     }
 
     public function testDataIsNotAnArrayException(): void
     {
         $this->expectError(TypeError::class);
-        $this->users->get('notAnArray');
-    }
-    
-    /**
-     * testHasMethodCreate
-     *
-     * @return void
-     */
-    public function testHasMethodCreate(): void
-    {
-        $this->assertTrue(method_exists(Users::class, 'create'));
-    }
-
-    public function testHasMethodCreateCallback(): void
-    {
-        $this->assertTrue(method_exists(Users::class, 'createCallback'));
-        $reflexion = new ReflectionMethod(Users::class, 'createCallback');
-        $this->assertTrue($reflexion->isPrivate(), 'createCallback should be private');
-    }
-
-    public function testCreateReturnsArray(): void
-    {
-        $_POST['firstname'] = 'Jhon';
-        $_POST['lastname'] = 'Doe';
-        $this->assertIsArray($this->users->create());
+        self::$users->get('notAnArray');
     }
     
     /**
@@ -85,14 +93,22 @@ class UsersTest extends TestCase
     public function testUpdateEmptyIdException(): void
     {
         $this->expectException(ArgumentCountError::class);
-        $this->users->update();
+        self::$users->update();
     }
 
     public function testUpdateReturnsArray(): void
     {
-        $_POST['firstname'] = 'Jhon';
-        $_POST['lastname'] = 'Doe';
-        $this->assertIsArray($this->users->update(['id' => md5(uniqid(rand(), true))]));
+        $_POST['firstname'] = 'Test updated firstname';
+        $_POST['lastname'] = 'Test updated lastname';
+        self::$mockUser = self::$users->update(['id' => self::$mockUser['id']]);
+        $this->assertIsArray(self::$mockUser);
+    }
+
+    public function testUserUpdated(): void
+    {
+        $this->assertMatchesRegularExpression('/[a-f0-9]{32}/', self::$mockUser['id']);
+        $this->assertEquals('Test updated firstname', self::$mockUser['firstname']);
+        $this->assertEquals('Test updated lastname', self::$mockUser['lastname']);
     }
     
     /**
@@ -115,6 +131,12 @@ class UsersTest extends TestCase
     public function testDeleteEmptyIdException(): void
     {
         $this->expectException(ArgumentCountError::class);
-        $this->users->delete();
+        self::$users->delete();
+    }
+
+    public function testDeleteUser(): void
+    {
+        self::$users->delete(self::$mockUser);
+        $this->assertEmpty(self::$users->get(['id' => self::$mockUser['id']]));
     }
 }
