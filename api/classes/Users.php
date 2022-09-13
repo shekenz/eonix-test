@@ -115,6 +115,12 @@ class Users
      */
     private function createCallback(): void
     {
+        // Data validation
+        $errors = [];
+        if(empty($_POST['firstname'])) { array_push($errors, 'Firstname is required'); }
+        if(empty($_POST['lastname'])) { array_push($errors, 'Lastname is required'); }
+        if(!empty($errors)) { View::error($errors); }
+
         // Creates a new user
         $binGUID = md5(uniqid(rand(), true), true);
         $statement = $this->handler->prepare('INSERT INTO users(id, firstname, lastname) VALUES (:id, :firstname, :lastname)');
@@ -122,9 +128,6 @@ class Users
         $statement->bindParam(':firstname', $_POST['firstname']);
         $statement->bindParam(':lastname', $_POST['lastname']);
         $statement->execute();
-
-        // TODO Return error if data is missing
-
     }
     
     /**
