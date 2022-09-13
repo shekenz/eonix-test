@@ -243,9 +243,14 @@ class Users
      *
      * @return void
      */
-    private function deleteCallback()
+    private function deleteCallback(string $id): bool
     {
-        $this->handler->query();
+        $binId = hex2bin($id);
+
+        $statement = $this->handler->prepare('DELETE FROM users WHERE id = :id');
+        $statement->bindParam(':id', $binId, PDO::PARAM_LOB);
+        $statement->execute();
+        return (bool) $statement->rowCount();
     }
     
     /**
@@ -253,8 +258,21 @@ class Users
      *
      * @return void
      */
-    public function delete(): void
+    public function delete(array $data): void
     {
-        $this->testDatabase([$this, 'deleteCallback']);
+        // NB: Router enforce the presence of a 16 bytes GUID
+
+        $result = $this->testDatabase(function() use ($data) { return $this->deleteCallback($data['id']); });
+
+        if($result)
+        {
+            View::buffer();
+        }
+
+        else
+        {
+            View::notFound();
+        }
+
     }
 }
