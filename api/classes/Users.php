@@ -129,6 +129,12 @@ class Users
         $statement->bindParam(':firstname', $_POST['firstname']);
         $statement->bindParam(':lastname', $_POST['lastname']);
         $statement->execute();
+
+        return [
+            'id' => bin2hex($binGUID),
+            'firstname' => $_POST['firstname'],
+            'lastname' => $_POST['lastname']
+        ];
     }
     
     /**
@@ -138,7 +144,7 @@ class Users
      */
     public function create(): void
     {
-        $this->testDatabase([$this, 'createCallback']);
+        View::render($this->testDatabase([$this, 'createCallback']));
     }
     
     /**
