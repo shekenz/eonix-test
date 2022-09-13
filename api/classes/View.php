@@ -30,10 +30,11 @@ class View
         if($die) { die(); }
     }
 
-    public static function notFound(): void
+    public static function notFound(bool $die = true): void
     {
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
         header('Content-Type: application/json; charset=utf-8');
+        if($die) { die(); }
     }
 
     public static function methodNotAllowed(): void
