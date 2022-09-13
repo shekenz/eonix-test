@@ -87,6 +87,20 @@ class Users
             if(!empty($errors)) { View::error($errors); }
         }
     }
+    
+    /**
+     * getData
+     * 
+     * Returns the previously fetched data, which represent the data before calling the View class.
+     * This is usefull to test the data.
+     *
+     * @return void
+     */
+    public function getData()
+    {
+        return $this->receivedData;
+    }
+    
     /**
      * getCallback
      *
@@ -133,8 +147,8 @@ class Users
     public function get(array $data = [])
     {
         $id = $data['id'] ?? '';
-        $result = $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
-        View::render($result);
+        $this->receivedData = (array) $this->testDatabase(function() use ($id) { return $this->getCallback($id); });
+        View::render($this->receivedData);
     }
     
     /**
@@ -170,7 +184,8 @@ class Users
      */
     public function create(): void
     {
-        View::render($this->testDatabase([$this, 'createCallback']));
+        $this->receivedData = (array) $this->testDatabase([$this, 'createCallback']);
+        View::render($this->receivedData);
     }
     
     /**
