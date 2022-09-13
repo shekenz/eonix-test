@@ -90,9 +90,6 @@ class Database
     {
         try
         {
-            $query = '';
-            $successMessage = '';
-
             switch($type)
             {   
                 case 'table': // Create only the missing table
