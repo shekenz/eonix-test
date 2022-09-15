@@ -6,7 +6,14 @@ use API\Router;
 use API\Users;
 use API\View;
 
-$users = new Users;
+// Checking for application/json data-type
+if($_SERVER['CONTENT_TYPE'] !== 'application/json')
+{
+    View::wrongContentType();
+}
+
+// Instanciate Users controller with JSON data;
+$users = new Users(json_decode(file_get_contents('php://input'), true));
 
 $routes = [
     ['POST', '/users', [$users, 'get'] ],
