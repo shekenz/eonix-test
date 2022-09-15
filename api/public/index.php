@@ -15,6 +15,7 @@ if($_SERVER['CONTENT_TYPE'] !== 'application/json')
 // Instanciate Users controller with JSON data;
 $users = new Users(json_decode(file_get_contents('php://input'), true));
 
+// Request route
 $routes = [
     ['POST', '/users', [$users, 'get'] ],
     ['POST', '/users/', [$users, 'get'] ],
@@ -28,4 +29,5 @@ $routes = [
 $router = new Router($routes);
 $router->dispatch();
 
+// Close output buffer and sends final page with headers and data
 View::render();

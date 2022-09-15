@@ -10,8 +10,6 @@ use Exception;
 use Error;
 
 /**
- * Database
- * 
  * Singleton to initiate database connection
  * 
  */
@@ -20,17 +18,17 @@ class Database
     private static $instance;
     private static $handler;
     private $logger;
-    private $fatalErrors;
 
     private function __construct()
     {
         $this->logger = Logger::getInstance();
-        $this->fatalErrors = false;
 
+        // Loads .env
         Environement::init();
 
         try
         {
+            // Connect to MySQL/MariaDB server
             self::$handler = new \PDO(
                 'mysql:host='.$_ENV['DB_HOST'].';
                        port='.$_ENV['DB_PORT'].';
@@ -47,6 +45,7 @@ class Database
         {
             if(isset($e->errorInfo) && $e->errorInfo[1] === 1049) // Error 1049 : Unknown database
             {
+                // Try to create database and table
                 $this->init();
             }
 
@@ -57,7 +56,12 @@ class Database
             }
         }
     }
-
+    
+    /**
+     * Singleton instanciation
+     *
+     * @return self
+     */
     public static function getInstance(): self
     {
         if(null === self::$instance) {
@@ -68,8 +72,6 @@ class Database
     }
     
     /**
-     * handler
-     *
      * Getter for the PDO handler
      * 
      * @return PDO
@@ -80,10 +82,9 @@ class Database
     }
     
     /**
-     * init
-     *
-     * Tries to create the database and table
+     * Tries to create the database or table or both
      * 
+     * @param string $type (optional) [table|database|user] What to create
      * @return void
      */
     public function init(string $type = 'all'): void
@@ -106,7 +107,7 @@ class Database
                     $successMessage = 'Created database '.$_ENV['DB_NAME'];
                     break;
 
-                case 'all':
+                case 'all': // Create both
                 default :
                     $query = 'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'` CHARACTER SET utf8mb4'.
                              '; USE `'.$_ENV['DB_NAME'].'`'.
@@ -132,29 +133,21 @@ class Database
                 $this->logger->emergency('Caught unhandled PDOException : '.$e->getMessage());
             }
 
-             $this->fatalErrors = true;
+            View::serverError();
         }
 
         // Just in case
         catch(Exception $e)
         {
             $this->logger->emergency('Caught unhandled Exception : '.$e->getMessage());
-            $this->fatalErrors = true;
+            View::serverError();
         }
 
         // Never too sure
         catch(Error $e)
         {
             $this->logger->emergency('Caught unhandled Error : '.$e->getMessage());
-            $this->fatalErrors = true;
-        }
-
-        finally
-        {
-            if(true === $this->fatalErrors)
-            {
-                View::serverError();
-            }
+            View::serverError();
         }
     }
 }

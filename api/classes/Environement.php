@@ -7,6 +7,11 @@ use Dotenv\Exception\InvalidPathException;
 use API\Logger;
 use API\View;
 
+/**
+ * Singleton wrapper for Dotenv
+ * Loads .env variables
+ * 
+ */
 class Environement
 {
     private static $instance;
@@ -30,6 +35,11 @@ class Environement
         }
     }
     
+    /**
+     * Singleton instanciation
+     *
+     * @return void
+     */
     public static function init(): void
     {
         if(null === self::$instance)

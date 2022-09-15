@@ -7,6 +7,10 @@ use API\Logger;
 use PDOException;
 use PDO;
 
+/**
+ * Users controller
+ * 
+ */
 class Users
 {
     private $db;
@@ -33,7 +37,7 @@ class Users
     }
     
     /**
-     * testDatabase
+     * Tests if table exists before executing an callback
      *
      * This method tries to execute a $callback (which executes an SQL statement).
      * If the table does not exist, we try to create it with Database->init('table') method,
@@ -42,7 +46,7 @@ class Users
      * This allows us to try to create missing table only when needed, so we avoid checking
      * for it at every client requests.
      * 
-     * @param  mixed $callback
+     * @param  callable $callback
      * @return void
      */
     private function testDatabase(callable $callback)
@@ -70,9 +74,7 @@ class Users
     }
     
     /**
-     * cleanData
-     * 
-     * Trims data from empty spaces and invisible characters.
+     * Trims out data from empty spaces and invisible characters
      *
      * @return string
      */
@@ -82,9 +84,12 @@ class Users
      }
     
     /**
-     * getCallback
+     * Fetches users in database
+     * 
+     * If ID is provided, fetches the specific user.
+     * If ID is not provided, fetches all users and filter result with provided filters.
      *
-     * @param  mixed $id
+     * @param  string $id (optional) ID of the user to retrieve
      * @return array
      */
     private function getCallback(string $id = ''): array
@@ -92,13 +97,14 @@ class Users
         // If no id is specified, we return all users matching the filter
         if($id === '')
         {
-            // Building query depending on filters presence
+            // Default values ans init
             $firstnamePresent = array_key_exists('firstname', $this->data);
             $lastnamePresent = array_key_exists('lastname', $this->data);
             $firstnameFilter = '';
             $lastnameFilter = '';
             $filterLink = 'AND';
-
+            
+            // Building query depending on presence of the filters
             $query = 'SELECT * FROM users WHERE ';
 
             if($firstnamePresent || $lastnamePresent)
@@ -107,6 +113,8 @@ class Users
                 {
                     $firstnameFilter = $this->cleanData($this->data['firstname']);
                     $query .= '(firstname LIKE :firstnameFilterStart OR firstname LIKE :firstnameFilterEnd)';
+
+                    // Joining queries together
                     (!$lastnamePresent) ?: $query .= ' '.$filterLink.' ';
                 }
 
@@ -122,8 +130,10 @@ class Users
                 $query .= '1';
             }
 
+            // Preparing query
             $statement = $this->handler->prepare($query);
 
+            // Binding values depending on presence of the filters
             if($firstnamePresent)
             {
                 $statement->bindValue(':firstnameFilterStart', $firstnameFilter.'%');
@@ -136,6 +146,7 @@ class Users
                 $statement->bindValue(':lastnameFilterEnd', '%'.$lastnameFilter);
             }
 
+            // Execute query, fetch data
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -144,30 +155,29 @@ class Users
         // Else we return the specific user by its id
         else
         {
-            $id = hex2bin($id);
-
             $statement = $this->handler->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
-            $statement->bindParam(':id', $id, PDO::PARAM_LOB);
+            $statement->bindValue(':id', hex2bin($id), PDO::PARAM_LOB);
             $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         }
         
         foreach($result as $index => $user)
         {
+            // Unpacking id binary
             $result[$index]['id'] = bin2hex($user['id']);
         }
         
         // Replace $result with empty array when user id is not found (result === null)
         (null !== $result) ?: $result = [];
 
-        // If only 1 is in array and we were looking only for 1 user, collapse row
+        // If only 1 user is in array and we were looking only for 1 user, collapse row
         return (count($result) == 1 && $id !== '') ? $result[0] : $result;
     }
     
     /**
-     * get wrapper
+     * Safely executes getCallback()
      *
-     * @param  mixed $id
+     * @param  array $data (optional) Data from the router
      * @return array
      */
     public function get(array $data = []): array
@@ -187,12 +197,10 @@ class Users
     }
     
     /**
-     * createMultipleCallback
+     * Method to insert multiple user at once
      * 
      * //TODO Work in progress
-     * Method to insert multiple user at once
-     *
-     * @param  mixed $id
+     * 
      * @return array
      */
     /*
@@ -226,7 +234,12 @@ class Users
         $statement->execute();
     }
     */
-
+    
+    /**
+     * Creates a new user with the provided JSON data
+     *
+     * @return array
+     */
     private function createCallback(): array
     {
         // Check if data is present and sanitize
@@ -251,6 +264,7 @@ class Users
         $statement->bindParam(':lastname', $this->data['lastname']);
         $statement->execute();
 
+        // Returns inserted data to client
         return [
             'id' => bin2hex($binGUID),
             'firstname' => $this->data['firstname'],
@@ -259,7 +273,7 @@ class Users
     }
     
     /**
-     * create wrapper
+     * Safely executes createCallback()
      *
      * @return array
      */
@@ -270,8 +284,9 @@ class Users
     }
     
     /**
-     * updateCallback
+     * Updates user information with provided JSON data
      *
+     * @param string $id ID of the user to update
      * @return array
      */
     private function updateCallback(string $id): array
@@ -293,14 +308,13 @@ class Users
             View::notFound();
         }
 
-        $binId = hex2bin($id);
-
         $statement = $this->handler->prepare('UPDATE users SET firstname = :firstname, lastname = :lastname WHERE id = :id');
-        $statement->bindParam(':id', $binId, \PDO::PARAM_LOB);
+        $statement->bindValue(':id', hex2bin($id), \PDO::PARAM_LOB);
         $statement->bindParam(':firstname', $firstname);
         $statement->bindParam(':lastname', $lastname);
         $statement->execute();
 
+        // Returns inserted data to client
         return [            
             'id' => $id,
             'firstname' => $firstname,
@@ -310,9 +324,10 @@ class Users
     }
     
     /**
-     * update wrapper
+     * Safely executes updateCallback()
      *
-     * @return void
+     * @param array $data Data from the router
+     * @return array
      */
     public function update(array $data): array
     {
@@ -321,9 +336,10 @@ class Users
     }
     
     /**
-     * deleteCallback
+     * Deletes a specific user with its ID
      *
-     * @return void
+     * @param string $id GUID (16bytes) of the user
+     * @return bool Returns false if nothing got deleted
      */
     private function deleteCallback(string $id): bool
     {
@@ -336,14 +352,14 @@ class Users
     }
     
     /**
-     * delete wrapper
+     * Safely executes deleteCallback()
      *
+     * @param array $data Data from the router
      * @return void
      */
     public function delete(array $data): void
     {
         // NB: Router enforce the presence of a 16 bytes GUID
-
         $result = $this->testDatabase(function() use ($data) { return $this->deleteCallback($data['id']); });
 
         if($result)

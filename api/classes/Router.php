@@ -9,7 +9,8 @@ use FastRoute\Dispatcher;
 use API\View;
 
 /**
- * Router
+ * Wrapper for nikic/fast-route
+ * 
  */
 class Router
 {
@@ -25,7 +26,13 @@ class Router
             }
         });
     }
-
+    
+    /**
+     * Removes get data from URI
+     *
+     * @param  string $uri
+     * @return string
+     */
     public function stripQuery(string $uri): string
     {
         if(false !== $position = strpos($uri, '?')) {
@@ -34,7 +41,12 @@ class Router
 
         return rawurldecode($uri);
     }
-
+    
+    /**
+     * Dispatches route
+     *
+     * @return void
+     */
     public function dispatch(): void
     {
         $route = $this->dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $this->uri);
@@ -45,7 +57,12 @@ class Router
             case Dispatcher::FOUND: $route[1]($route[2]); break;
         }
     }
-
+    
+    /**
+     * Getter for $uri
+     *
+     * @return string
+     */
     public function getUri(): string
     {
         return $this->uri;

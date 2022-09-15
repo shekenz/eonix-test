@@ -6,9 +6,8 @@ use Monolog\Logger as OriginalLogger;
 use Monolog\Handler\StreamHandler;
 
 /**
- * Logger
- * 
  * A singleton wrapper for Monolog\Logger
+ * 
  */
 class Logger
 {
@@ -21,6 +20,11 @@ class Logger
         self::$logger->pushHandler(new StreamHandler(__DIR__.'/../../api.log'));
     }
 
+    /**
+     * Singleton instanciation
+     *
+     * @return self
+     */
     public static function getInstance(): self
     {
         if(null === self::$instance) {
@@ -29,48 +33,101 @@ class Logger
 
         return self::$instance;
     }
-
+    
+    /**
+     * Getter for the original Monolg/Logger object.
+     *
+     * @return OriginalLogger
+     */
     public function logger(): OriginalLogger
     {
         return self::$logger;
     }
-
-    public function debug($message): void
+    
+    /**
+     * debug() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function debug(string $message): void
     {
         self::$logger->debug($message);
     }
-
-    public function info($message): void
+    
+    /**
+     * info() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function info(string $message): void
     {
         self::$logger->info($message);
     }
-
-    public function notice($message): void
+    
+    /**
+     * notice() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function notice(string $message): void
     {
         self::$logger->notice($message);
     }
-
-    public function warning($message): void
+    
+    /**
+     * warning() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function warning(string $message): void
     {
         self::$logger->warning($message);
     }
-
-    public function error($message): void
+    
+    /**
+     * error() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function error(string $message): void
     {
         self::$logger->error($message);
     }
-
-    public function critical($message): void
+    
+    /**
+     * critical() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function critical(string $message): void
     {
         self::$logger->critical($message);
     }
-
-    public function alert($message): void
+    
+    /**
+     * alert() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function alert(string $message): void
     {
         self::$logger->alert($message);
     }
-
-    public function emergency($message): void
+    
+    /**
+     * emergency() method wrapper
+     *
+     * @param  string $message
+     * @return void
+     */
+    public function emergency(string $message): void
     {
         self::$logger->emergency($message);
     }
