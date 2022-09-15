@@ -10,7 +10,7 @@ class UsersTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$users = new Users();
+        self::$users = new Users(['firstname' => 'Test created firstname', 'lastname' => 'Test created lastname']);
     }
 
     /**
@@ -32,8 +32,6 @@ class UsersTest extends TestCase
 
     public function testCreateReturnsArray(): void
     {
-        $_POST['firstname'] = 'Test created firstname';
-        $_POST['lastname'] = 'Test created lastname';
         self::$mockUser = self::$users->create();
         $this->assertIsArray(self::$mockUser);
     }
@@ -98,8 +96,6 @@ class UsersTest extends TestCase
 
     public function testUpdateReturnsArray(): void
     {
-        $_POST['firstname'] = 'Test updated firstname';
-        $_POST['lastname'] = 'Test updated lastname';
         self::$mockUser = self::$users->update(['id' => self::$mockUser['id']]);
         $this->assertIsArray(self::$mockUser);
     }
