@@ -94,12 +94,10 @@ class Database
             {   
                 case 'table': // Create only the missing table
 
-                    // TODO Check if it is better to add index on firstname and lastname. I think so.
-
                     // More info on why I used binary(16) for GUID
                     // https://stackoverflow.com/questions/2365132/uuid-performance-in-mysql/#answer-7578500
                     // https://stitcher.io/blog/optimised-uuids-in-mysql
-                    $query = 'CREATE TABLE IF NOT EXISTS users (id binary(16) PRIMARY KEY, firstname varchar(255) NOT NULL, lastname varchar(255) NOT NULL)';
+                    $query = 'CREATE TABLE IF NOT EXISTS users (id BINARY(16) PRIMARY KEY, firstname VARCHAR(255) NOT NULL, lastname VARCHAR(255) NOT NULL, INDEX names (firstname, lastname))';
                     $successMessage = 'Created table users';
                     break;
 
@@ -112,7 +110,7 @@ class Database
                 default :
                     $query = 'CREATE DATABASE IF NOT EXISTS `'.$_ENV['DB_NAME'].'` CHARACTER SET utf8mb4'.
                              '; USE `'.$_ENV['DB_NAME'].'`'.
-                             '; CREATE TABLE IF NOT EXISTS users (id binary(16) PRIMARY KEY, firstname varchar(255) NOT NULL, lastname varchar(255) NOT NULL)';
+                             '; CREATE TABLE IF NOT EXISTS users (id BINARY(16) PRIMARY KEY, firstname VARCHAR(255) NOT NULL, lastname VARCHAR(255) NOT NULL, INDEX names (firstname, lastname))';
                     $successMessage = 'Created database '.$_ENV['DB_NAME'].' and table users in one query';
             }
 
