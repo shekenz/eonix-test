@@ -12,12 +12,16 @@ class Users
     private $db;
     private $handler;
     private $logger;
+    private $data;
 
-    public function __construct()
+    public function __construct(array $data = [])
     {
         $this->db = Database::getInstance();
         $this->handler = $this->db->handler();
         $this->logger = Logger::getInstance();
+
+        // JSON data
+        $this->data = $data;
     }
     
     /**
@@ -58,35 +62,16 @@ class Users
     }
     
     /**
-     * validatePostData
+     * cleanData
      * 
-     * Trims firstname and last name from empty spaces and invisible characters,
-     * and send a Error view if one of them is empty
+     * Trims data from empty spaces and invisible characters.
      *
-     * @return void
+     * @return string
      */
-    private function validatePostData(bool $strict = true): void
-    {
-        // Stripping invisible characters
-        if (array_key_exists('firstname', $_POST))
-        {
-            $_POST['firstname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['firstname']));
-        }
-
-        if (array_key_exists('lastname', $_POST))
-        {
-            $_POST['lastname'] = trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $_POST['lastname']));
-        }
-
-        // Data validation
-        if ($strict)
-        {
-            $errors = [];
-            if(empty($_POST['firstname'])) { array_push($errors, 'Firstname is required'); }
-            if(empty($_POST['lastname'])) { array_push($errors, 'Lastname is required'); }
-            if(!empty($errors)) { View::error($errors); }
-        }
-    }
+     private function cleanData(string $data): string
+     {
+        return trim(preg_replace('/[\x00-\x1F\x7F]/u', '', $data));
+     }
     
     /**
      * getCallback
@@ -148,28 +133,73 @@ class Users
     }
     
     /**
-     * createCallback
+     * createMultipleCallback
+     * 
+     * //TODO Work in progress
+     * Method to insert multiple user at once
      *
      * @param  mixed $id
      * @return array
      */
+    /*
+    private function createMultipleCallback()//: array
+    {
+        // Needs data sanitation an validation
+
+        $query = 'INSERT INTO users(id, firstname, lastname) VALUES ';
+
+        // Building query string
+        foreach($this->data as $index => $value)
+        {
+            if(is_int($index))
+            {
+                $query .= '(:id_'.$index.', :firstname_'.$index.', :lastname_'.$index.'),';
+            }
+        }
+        $query = substr($query, 0, -1);
+
+        // Creates a new users
+        $statement = $this->handler->prepare($query);
+
+        // Binding values
+        foreach($this->data as $index => $value)
+        {
+            $statement->bindValue(':id_'.$index, md5(uniqid(rand(), true), true), \PDO::PARAM_LOB);
+            $statement->bindParam(':firstname_'.$index, $value['firstname']);
+            $statement->bindParam(':lastname_'.$index, $value['lastname']);
+        }
+        
+        $statement->execute();
+    }
+    */
+
     private function createCallback(): array
     {
-        // Validation
-        $this->validatePostData();
+        if(array_key_exists('firstname', $this->data) && array_key_exists('lastname', $this->data))
+        {
+            foreach($this->data as $key => $value)
+            {
+                $this->data[$key] = $this->cleanData($value);
+            }
+        }
 
-        // Creates a new user
+        else
+        {
+            View::error();
+        }
+
+        // Query
         $binGUID = md5(uniqid(rand(), true), true);
         $statement = $this->handler->prepare('INSERT INTO users(id, firstname, lastname) VALUES (:id, :firstname, :lastname)');
-        $statement->bindParam(':id', $binGUID, \PDO::PARAM_LOB);
-        $statement->bindParam(':firstname', $_POST['firstname']);
-        $statement->bindParam(':lastname', $_POST['lastname']);
+        $statement->bindParam(':id', $binGUID, PDO::PARAM_LOB);
+        $statement->bindParam(':firstname', $this->data['firstname']);
+        $statement->bindParam(':lastname', $this->data['lastname']);
         $statement->execute();
 
         return [
             'id' => bin2hex($binGUID),
-            'firstname' => $_POST['firstname'],
-            'lastname' => $_POST['lastname']
+            'firstname' => $this->data['firstname'],
+            'lastname' => $this->data['lastname']
         ];
     }
     
@@ -193,17 +223,15 @@ class Users
     {
         // NB: Router enforce the presence of a 16 bytes GUID
         $user = $this->getCallback($id);
-        
-        // Validation
-        $this->validatePostData(false);
 
         // Preparing data to update
-        // Would be better to create a query builder but I have no time for that
+        // NOTE : Would be better to create a query builder but I have no time for that
         if(!empty($user))
         {
             // Post data is opional
-            $firstname = $_POST['firstname'] ?? $user['firstname'];
-            $lastname = $_POST['lastname'] ?? $user['lastname'];
+            // REFACTOR Needs optimization : No need to cleanData when it is coming from database
+            $firstname = $this->cleanData($this->data['firstname'] ?? $user['firstname']);
+            $lastname = $this->cleanData($this->data['lastname'] ?? $user['lastname']);
         } 
     
         else
