@@ -28,7 +28,7 @@ class View
         array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 400 Bad Request');
         array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
         
-        if(!empty($data))
+        if(!empty($messages))
         {
             self::$buffer = json_encode(['errors' => $messages]);
         }
@@ -67,10 +67,15 @@ class View
         }
     }
 
-    public static function badGateway(): void
+    public static function wrongContentType(bool $die = true): void
     {
-        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL']." 502 Bad Gateway");
+        array_push(self::$headers, $_SERVER['SERVER_PROTOCOL'].' 415 Unsupported Media Type');
         array_push(self::$headers, 'Content-Type: application/json; charset=utf-8');
+
+        if($die)
+        {
+            self::render();
+        }
     }
 
     public static function render(): void
