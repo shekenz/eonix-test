@@ -71,6 +71,7 @@ Server responds with the updated user as application/json.
 - Le controller `Users` combine en réalité la logique Controller et Model afin de simplifier le développement.
 - Je n'ai volontairement pas utilisé les fonctions d'output buffer de PHP dans ma classe de rendu (View) afin de ne pas générer des signalements "risky" dans PHPUnit (certaines méthodent ouvrent un buffer qui sera refermé ensuite par la classe de rendu, ce que PHPUnit n'apréciait pas lors des tests)
 - Le shema de donnée JSON est toujours le même, que ce soit pour créer, mettre à jour ou filtrer les utilisateurs : un tableau associatifs contenant les clés `firstname` et `lastname`, encore une fois dans une logique de simplification et d'efficacité.
+- Le projet comporte 48 tests qui permettent de vérifier que tout fonctionne bien comme il se doit.
 
 ##### Ce que j'aurai aimé ajouter (avec plus de temps) :
 
