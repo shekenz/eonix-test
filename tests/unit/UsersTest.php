@@ -5,12 +5,14 @@ use API\Users;
 
 class UsersTest extends TestCase
 {
-    private static $users;
+    private static $usersWithDataForCreation;
+    private static $usersWithDataForUpdate;
     private static $mockUser;
 
     public static function setUpBeforeClass(): void
     {
-        self::$users = new Users(['firstname' => 'Test created firstname', 'lastname' => 'Test created lastname']);
+        self::$usersWithDataForCreation = new Users(['firstname' => 'Test created firstname', 'lastname' => 'Test created lastname']);
+        self::$usersWithDataForUpdate = new Users(['firstname' => 'Test updated firstname', 'lastname' => 'Test updated lastname']);
     }
 
     /**
@@ -32,7 +34,7 @@ class UsersTest extends TestCase
 
     public function testCreateReturnsArray(): void
     {
-        self::$mockUser = self::$users->create();
+        self::$mockUser = self::$usersWithDataForCreation->create();
         $this->assertIsArray(self::$mockUser);
     }
 
@@ -62,13 +64,13 @@ class UsersTest extends TestCase
 
     public function testGetReturnsArray(): void
     {
-        $this->assertIsArray(self::$users->get());
+        $this->assertIsArray(self::$usersWithDataForCreation->get());
     }
 
     public function testDataIsNotAnArrayException(): void
     {
         $this->expectError(TypeError::class);
-        self::$users->get('notAnArray');
+        self::$usersWithDataForCreation->get('notAnArray');
     }
     
     /**
@@ -91,12 +93,12 @@ class UsersTest extends TestCase
     public function testUpdateEmptyIdException(): void
     {
         $this->expectException(ArgumentCountError::class);
-        self::$users->update();
+        self::$usersWithDataForUpdate->update();
     }
 
     public function testUpdateReturnsArray(): void
     {
-        self::$mockUser = self::$users->update(['id' => self::$mockUser['id']]);
+        self::$mockUser = self::$usersWithDataForUpdate->update(['id' => self::$mockUser['id']]);
         $this->assertIsArray(self::$mockUser);
     }
 
@@ -127,12 +129,12 @@ class UsersTest extends TestCase
     public function testDeleteEmptyIdException(): void
     {
         $this->expectException(ArgumentCountError::class);
-        self::$users->delete();
+        self::$usersWithDataForCreation->delete();
     }
 
     public function testDeleteUser(): void
     {
-        self::$users->delete(self::$mockUser);
-        $this->assertEmpty(self::$users->get(['id' => self::$mockUser['id']]));
+        self::$usersWithDataForCreation->delete(self::$mockUser);
+        $this->assertEmpty(self::$usersWithDataForCreation->get(['id' => self::$mockUser['id']]));
     }
 }
