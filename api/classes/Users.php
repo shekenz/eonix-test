@@ -14,14 +14,22 @@ class Users
     private $logger;
     private $data;
 
-    public function __construct(array $data = [])
+    public function __construct(array|null $data = [])
     {
         $this->db = Database::getInstance();
         $this->handler = $this->db->handler();
         $this->logger = Logger::getInstance();
 
         // JSON data
-        $this->data = $data;
+        if(null !== $data)
+        {
+            $this->data = $data;
+        }
+        
+        else
+        {
+            View::error(['JSON badly formated']);
+        }
     }
     
     /**
@@ -81,13 +89,59 @@ class Users
      */
     private function getCallback(string $id = ''): array
     {
+        // If no id is specified, we return all users matching the filter
         if($id === '')
         {
-            $statement = $this->handler->query('SELECT * FROM users');
+            // Building query depending on filters presence
+            $firstnamePresent = array_key_exists('firstname', $this->data);
+            $lastnamePresent = array_key_exists('lastname', $this->data);
+            $firstnameFilter = '';
+            $lastnameFilter = '';
+            $filterLink = 'AND';
+
+            $query = 'SELECT * FROM users WHERE ';
+
+            if($firstnamePresent || $lastnamePresent)
+            {
+                if($firstnamePresent)
+                {
+                    $firstnameFilter = $this->cleanData($this->data['firstname']);
+                    $query .= '(firstname LIKE :firstnameFilterStart OR firstname LIKE :firstnameFilterEnd)';
+                    (!$lastnamePresent) ?: $query .= ' '.$filterLink.' ';
+                }
+
+                if($lastnamePresent)
+                {
+                    $lastnameFilter = $this->cleanData($this->data['lastname']);
+                    $query .= '(lastname LIKE :lastnameFilterStart OR lastname LIKE :lastnameFilterEnd)';
+                }
+            }
+
+            // WHERE = 1
+            else{
+                $query .= '1';
+            }
+
+            $statement = $this->handler->prepare($query);
+
+            if($firstnamePresent)
+            {
+                $statement->bindValue(':firstnameFilterStart', $firstnameFilter.'%');
+                $statement->bindValue(':firstnameFilterEnd', '%'.$firstnameFilter);
+            }
+
+            if($lastnamePresent)
+            {
+                $statement->bindValue(':lastnameFilterStart', $lastnameFilter.'%');
+                $statement->bindValue(':lastnameFilterEnd', '%'.$lastnameFilter);
+            }
+
+            $statement->execute();
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         }
         
+        // Else we return the specific user by its id
         else
         {
             $id = hex2bin($id);
@@ -175,6 +229,7 @@ class Users
 
     private function createCallback(): array
     {
+        // Check if data is present and sanitize
         if(array_key_exists('firstname', $this->data) && array_key_exists('lastname', $this->data))
         {
             foreach($this->data as $key => $value)
@@ -228,10 +283,9 @@ class Users
         // NOTE : Would be better to create a query builder but I have no time for that
         if(!empty($user))
         {
-            // Post data is opional
-            // REFACTOR Needs optimization : No need to cleanData when it is coming from database
-            $firstname = $this->cleanData($this->data['firstname'] ?? $user['firstname']);
-            $lastname = $this->cleanData($this->data['lastname'] ?? $user['lastname']);
+            // Data is optional
+            $firstname = (array_key_exists('firstname', $this->data)) ? $this->cleanData($this->data['firstname']) : $user['firstname'];
+            $lastname = (array_key_exists('lastname', $this->data)) ? $this->cleanData($this->data['lastname']) : $user['lastname'];
         } 
     
         else
