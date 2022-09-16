@@ -29,36 +29,25 @@ docker-compose -f service/docker-compose.yml up -d
 
 ### Use
 
-- **Create a new user** : `PUT` application/json request to `localhost:8200/user/create` with data :
+| Endpoint | Method | Description | Accepts data |
+| --- | --- | --- | --- |
+| `/user/create` | PUT | Create new user | Yes |
+| `/user/[id]` | POST | Get user by ID | No |
+| `/users` | POST | List users with filters | Yes |
+| `/user/update/[id]` | PATCH | Update user's data | Yes |
+| `/user/delete/[id]` | DELETE | Delete user | No |
+
+**Notes :**
+- All requests need to have the Content-Type header `application/json`.
+- All requests need a valid JSON body, even endpoints that don't accept data. A minimal body should be at least an empty JSON string `{}`.
+- User's ID is an 16 bytes hexadecimal string (32 characters). Anything different will be rejected.
+- Data structure is the same for all requests, weather you want to create, filter or update an user. The JSON should look like this :
 ``` js
 {
     "firstname": "John",
     "lastname": "Doe"
 }
 ```
-Server responds with the created user as application/json.
-
-- **Get a specific user** : `POST` application/json request to `localhost:8200/user/[id]` where id is hexadecimal 16bytes GUID. Server responds with the selected user as application/json.
-
-- **Get all users** : `POST` application/json request to `localhost:8200/users`. You can eventually pass filtering data :
-``` js
-{
-    "firstname": "Jo",
-    "lastname": "oe"
-}
-```
-Server responds with an array of users as application/json.
-
-- **Update an user** : `PATCH` application/json request to `localhost:8200/user/update/[id]` where id is hexadecimal 16bytes GUID. Pass data to update :
-``` js
-{
-    "firstname": "New firstname",
-    "lastname": "New lastname"
-}
-```
-Server responds with the updated user as application/json.
-
-- **Delete an user** : `DELETE` application/json request to `localhost:8200/user/delete/[id]` where id is hexadecimal 16bytes GUID. Server responds with a 200 or 404.
 
 ### Development notes (French)
 
